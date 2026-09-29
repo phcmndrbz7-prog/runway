@@ -1,0 +1,457 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>부산 런웨이 | 부산 러닝 코스 추천</title>
+<meta name="description" content="부산의 예쁜 길만 골라 연결한 러닝 코스 추천. 5km부터 21km까지 거리별 코스를 지도로 확인하세요.">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable-dynamic-subset.min.css">
+<style>
+  :root{
+    --navy:#0b355c; --blue:#0e6fd1; --sky:#e8f4fc; --ink:#22303c; --sub:#5b6b7a;
+    --cat5:#14b8c4; --cat10:#2fae5f; --cat15:#f59e0b; --cat20:#ef4444;
+    --line:#e3ecf3; --radius:18px;
+  }
+  *{margin:0;padding:0;box-sizing:border-box}
+  html{scroll-behavior:smooth}
+  body{font-family:'Pretendard Variable',Pretendard,-apple-system,'Malgun Gothic',sans-serif;color:var(--ink);background:#f6fafd;line-height:1.6}
+  a{color:inherit;text-decoration:none}
+
+  header{position:sticky;top:0;z-index:50;background:rgba(255,255,255,.85);backdrop-filter:blur(10px);border-bottom:1px solid var(--line)}
+  .nav{max-width:1200px;margin:0 auto;padding:14px 24px;display:flex;align-items:center;justify-content:space-between}
+  .logo{font-weight:800;font-size:20px;color:var(--navy);letter-spacing:-.5px}
+  .logo em{font-style:normal;color:var(--blue)}
+  .logo small{display:block;font-size:10px;font-weight:600;color:var(--sub);letter-spacing:2px}
+  nav ul{display:flex;gap:26px;list-style:none}
+  nav a{font-size:14.5px;font-weight:600;color:var(--sub);transition:.2s}
+  nav a:hover{color:var(--blue)}
+
+  .hero{position:relative;background:linear-gradient(135deg,#0b355c 0%,#0d5aa8 55%,#1193d4 100%);color:#fff;overflow:hidden}
+  .hero-in{max-width:1200px;margin:0 auto;padding:88px 24px 130px;position:relative;z-index:2}
+  .hero .eyebrow{display:inline-block;font-size:13px;font-weight:700;letter-spacing:1.5px;background:rgba(255,255,255,.14);border:1px solid rgba(255,255,255,.25);padding:7px 16px;border-radius:99px;margin-bottom:22px}
+  .hero h1{font-size:clamp(30px,4.6vw,52px);font-weight:800;line-height:1.22;letter-spacing:-1px}
+  .hero h1 em{font-style:normal;background:linear-gradient(90deg,#8fe3ff,#ffd08a);-webkit-background-clip:text;background-clip:text;color:transparent}
+  .hero p{margin-top:18px;font-size:17px;color:#cfe4f5;max-width:640px}
+  .hero-stats{display:flex;gap:12px;flex-wrap:wrap;margin-top:30px}
+  .hero-stats span{background:rgba(255,255,255,.12);border:1px solid rgba(255,255,255,.22);padding:9px 18px;border-radius:99px;font-size:13.5px;font-weight:600}
+  .cta{display:inline-block;margin-top:34px;background:#fff;color:var(--navy);font-weight:800;font-size:16px;padding:15px 34px;border-radius:99px;box-shadow:0 10px 30px rgba(0,0,0,.25);transition:.2s}
+  .cta:hover{transform:translateY(-3px)}
+  .waves{position:absolute;bottom:-2px;left:0;width:100%;z-index:1}
+  .waves svg{display:block;width:100%;height:90px}
+
+  main{max-width:1200px;margin:0 auto;padding:0 24px 40px}
+  .sec-title{margin:64px 0 10px;font-size:26px;font-weight:800;letter-spacing:-.5px}
+  .sec-sub{color:var(--sub);font-size:15px;margin-bottom:26px}
+
+  .layout{display:grid;grid-template-columns:470px 1fr;gap:30px;align-items:start}
+  @media(max-width:980px){.layout{grid-template-columns:1fr}}
+
+  .map-wrap{position:sticky;top:86px}
+  @media(max-width:980px){.map-wrap{position:relative;top:0}}
+  .map-card{background:#fff;border:1px solid var(--line);border-radius:var(--radius);overflow:hidden;box-shadow:0 8px 30px rgba(11,53,92,.08)}
+  .map-card svg{display:block;width:100%;height:auto}
+  .map-legend{display:flex;align-items:center;gap:14px;flex-wrap:wrap;padding:13px 18px;border-top:1px solid var(--line);font-size:12.5px;color:var(--sub)}
+  .lg{display:flex;align-items:center;gap:6px;font-weight:600}
+  .lg i{width:10px;height:10px;border-radius:50%;display:inline-block}
+  .map-reset{margin-left:auto;border:1px solid var(--line);background:#f4f8fb;color:var(--sub);border-radius:99px;padding:5px 13px;font-size:12px;font-weight:700;cursor:pointer;transition:.2s}
+  .map-reset:hover{color:var(--blue);border-color:var(--blue)}
+  .map-note{font-size:11.5px;color:#9aabb8;margin-top:10px;padding-left:4px}
+
+  .route{fill:none;stroke-width:4.5;stroke-linecap:round;stroke-linejoin:round;opacity:.9;transition:opacity .3s,stroke-width .3s;cursor:pointer}
+  .route:hover{opacity:1}
+  .mapsvg .dim{opacity:.08}
+  .mapsvg .hot{opacity:1;stroke-width:6.5;filter:drop-shadow(0 1px 4px rgba(0,0,0,.25))}
+  .r5{stroke:var(--cat5)} .r10{stroke:var(--cat10)} .r15{stroke:var(--cat15)} .r20{stroke:var(--cat20)}
+  .mk{cursor:pointer;transition:opacity .3s}
+  .mk.dim{opacity:.15}
+  .mk text{font-size:10px;font-weight:800;fill:#fff;font-family:inherit}
+  .place{font-size:12.5px;font-weight:700;fill:#6d7f8d;font-family:inherit}
+  .place.mtn{fill:#8aa07e;font-size:12px}
+  .river{fill:none;stroke:#9fd0e8;stroke-width:7;stroke-linecap:round;opacity:.8}
+  .coast{stroke:#bcd9c6;stroke-width:2}
+
+  .tabs{display:flex;gap:9px;flex-wrap:wrap;margin-bottom:22px}
+  .tab{border:1.5px solid var(--line);background:#fff;border-radius:99px;padding:9px 20px;font-size:14px;font-weight:700;color:var(--sub);cursor:pointer;transition:.2s}
+  .tab:hover{border-color:var(--blue);color:var(--blue)}
+  .tab.on{background:var(--navy);border-color:var(--navy);color:#fff}
+
+  .cards{display:grid;grid-template-columns:1fr;gap:16px}
+  .card{background:#fff;border:1px solid var(--line);border-radius:var(--radius);padding:22px 24px;cursor:pointer;transition:.25s;position:relative;overflow:hidden}
+  .card::before{content:"";position:absolute;left:0;top:0;bottom:0;width:5px;background:var(--catc);opacity:.85}
+  .card:hover{transform:translateY(-3px);box-shadow:0 12px 28px rgba(11,53,92,.1)}
+  .card.sel{border-color:var(--catc);box-shadow:0 12px 28px rgba(11,53,92,.14)}
+  .card-top{display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+  .badge{font-size:11.5px;font-weight:800;color:#fff;background:var(--catc);padding:4px 11px;border-radius:99px;letter-spacing:.3px}
+  .card h3{font-size:17.5px;font-weight:800;letter-spacing:-.3px;flex:1;min-width:200px}
+  .stars{font-size:13px;color:#f5a623;font-weight:700;white-space:nowrap}
+  .stars small{color:var(--sub);font-weight:600;margin-left:4px}
+  .mood{margin-top:9px;font-size:14.5px;color:#3c4c5a}
+  .chips{display:flex;gap:7px;flex-wrap:wrap;margin-top:13px}
+  .chip{font-size:12px;font-weight:600;color:var(--sub);background:#f1f6fa;border-radius:8px;padding:5px 10px}
+  .chip b{color:var(--ink)}
+  details{margin-top:14px;border-top:1px dashed var(--line);padding-top:12px}
+  summary{font-size:13.5px;font-weight:700;color:var(--blue);cursor:pointer;list-style:none;display:flex;align-items:center;gap:6px}
+  summary::-webkit-details-marker{display:none}
+  summary::before{content:"\25B8";transition:.2s;display:inline-block}
+  details[open] summary::before{transform:rotate(90deg)}
+  .detail-body{margin-top:11px;font-size:13.8px;color:#42525f}
+  .detail-body .lbl{font-size:11px;font-weight:800;color:#9aabb8;letter-spacing:1px;display:block;margin:12px 0 4px}
+  .detail-body .lbl:first-child{margin-top:0}
+  .detail-body ul{list-style:none}
+  .detail-body li{padding-left:16px;position:relative;margin:4px 0}
+  .detail-body li::before{content:"\00B7";position:absolute;left:2px;font-weight:900;color:var(--catc)}
+  .tipbox{background:#fff8ec;border:1px solid #f5e3bd;border-radius:10px;padding:10px 13px;font-size:13px;color:#7a5b1e;margin-top:6px}
+  .maplink{display:inline-block;margin-top:12px;font-size:12.5px;font-weight:700;color:var(--blue);border:1px solid var(--line);border-radius:99px;padding:6px 14px;transition:.2s}
+  .maplink:hover{background:var(--sky)}
+
+  .guide{display:grid;grid-template-columns:repeat(4,1fr);gap:14px}
+  @media(max-width:860px){.guide{grid-template-columns:repeat(2,1fr)}}
+  .g-item{background:#fff;border:1px solid var(--line);border-radius:var(--radius);padding:22px;border-top:5px solid var(--catc)}
+  .g-item h4{font-size:19px;font-weight:800}
+  .g-item .who{font-size:12px;font-weight:800;color:var(--catc);margin-top:2px}
+  .g-item p{font-size:13.5px;color:var(--sub);margin-top:9px}
+  .g-item .time{display:inline-block;margin-top:10px;font-size:12.5px;font-weight:700;background:#f1f6fa;padding:4px 11px;border-radius:99px;color:var(--ink)}
+
+  .tips{display:grid;grid-template-columns:repeat(3,1fr);gap:14px}
+  @media(max-width:860px){.tips{grid-template-columns:1fr}}
+  .tip-card{background:#fff;border:1px solid var(--line);border-radius:var(--radius);padding:22px}
+  .tip-card h4{font-size:15.5px;font-weight:800;display:flex;gap:9px;align-items:center}
+  .tip-card h4 .no{width:24px;height:24px;border-radius:50%;background:var(--sky);color:var(--blue);font-size:12.5px;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+  .tip-card p{font-size:13.5px;color:var(--sub);margin-top:9px}
+
+  footer{margin-top:70px;background:var(--navy);color:#9db8cf;font-size:12.5px;text-align:center;padding:30px 20px}
+  footer b{color:#fff}
+</style>
+</head>
+<body>
+
+<header>
+  <div class="nav">
+    <a class="logo" href="#top"><em>BUSAN</em> RUN<small>RUNWAY GUIDE</small></a>
+    <nav>
+      <ul>
+        <li><a href="#courses">거리별 코스</a></li>
+        <li><a href="#map">코스 지도</a></li>
+        <li><a href="#guide">거리 가이드</a></li>
+        <li><a href="#tips">러너 꿀팁</a></li>
+      </ul>
+    </nav>
+  </div>
+</header>
+
+<section class="hero" id="top">
+  <div class="hero-in">
+    <span class="eyebrow">BUSAN RUNNING GUIDE</span>
+    <h1>부산에서 오늘 어디 뛸까?<br><em>바다 · 강 · 산</em> 예쁜 길만 골라 연결했어요</h1>
+    <p>해운대 파도부터 금정산 능선까지, 부산의 산책로를 잇는 러닝 코스 10개.
+       5km · 10km · 15km · 20km, 오늘 다릴 거리만 선택하세요.</p>
+    <div class="hero-stats">
+      <span>코스 10개</span>
+      <span>거리 5 ~ 21km</span>
+      <span>지하철 접근</span>
+      <span>입문부터 대장까지</span>
+    </div>
+    <a class="cta" href="#courses">거리별 코스 보기</a>
+  </div>
+  <div class="waves">
+    <svg viewBox="0 0 1440 90" preserveAspectRatio="none"><path d="M0,50 C240,90 480,10 720,45 C960,80 1200,20 1440,55 L1440,90 L0,90 Z" fill="#f6fafd"/></svg>
+  </div>
+</section>
+
+<main>
+  <h2 class="sec-title" id="map">부산 러닝 코스 지도</h2>
+  <p class="sec-sub">카드를 클릭하면 지도에 코스가 표시됩니다. 마커를 눌러도 돼요. (부산광역시전도 참고 · 지형은 단순화)</p>
+
+  <div class="layout">
+    <div class="map-wrap">
+      <div class="map-card">
+        <svg class="mapsvg" id="busanMap" viewBox="0 0 1000 720" role="img" aria-label="부산 러닝 코스 지도">
+          <defs>
+            <linearGradient id="sea" x1="0" y1="0" x2="0" y2="1">
+              <stop offset="0" stop-color="#cfe9f6"/><stop offset="1" stop-color="#e9f6fc"/>
+            </linearGradient>
+          </defs>
+          <rect width="1000" height="720" fill="url(#sea)"/>
+          <path d="M1020,-20 L1020,70 C 950,100 900,150 872,215 C 850,265 830,300 812,318 L 800,345 C 786,358 774,366 762,372 L 727,376 C 716,368 708,374 700,385 C 686,381 670,380 655,378 C 646,375 638,373 630,370 C 618,379 607,389 596,399 C 586,413 579,432 575,450 C 567,476 556,501 544,522 C 537,532 531,537 528,540 C 518,545 509,547 500,548 C 488,547 477,546 467,545 C 456,541 447,537 440,532 C 431,529 422,528 415,528 L 402,524 C 404,531 406,538 408,545 C 412,552 415,558 418,565 C 413,577 408,590 405,600 C 403,610 401,619 400,628 C 383,635 366,638 350,640 C 333,642 315,643 300,645 L 262,634 C 240,640 220,644 200,647 C 180,649 160,650 140,651 L -20,651 L -20,-20 Z" fill="#eef5ea" class="coast"/>
+          <path d="M466,552 C483,558 495,572 498,592 C501,612 494,630 480,644 C470,652 458,656 450,652 C440,644 436,628 438,610 C440,590 448,570 458,558 C461,554 464,552 466,552 Z" fill="#eef5ea" class="coast"/>
+          <path d="M236,505 C244,498 262,496 276,500 C288,504 290,512 282,516 C270,521 250,520 240,515 C233,511 232,509 236,505 Z" fill="#e3efdd" class="coast"/>
+          <path class="river" d="M128,190 C158,255 225,290 228,355 C231,420 262,465 254,515 C248,555 256,600 262,632"/>
+          <path class="river" d="M508,232 C522,262 540,282 556,310" style="stroke-width:5"/>
+          <path class="river" d="M556,310 C564,342 580,372 596,399" style="stroke-width:5"/>
+          <path d="M385,195 C395,140 445,105 490,115 C525,122 540,155 532,190 C524,225 490,245 455,242 C420,239 378,235 385,195 Z" fill="#dde9d3"/>
+          <path d="M655,235 C665,190 700,170 730,185 C752,196 755,225 740,245 C722,262 685,262 668,252 C657,246 652,242 655,235 Z" fill="#dde9d3"/>
+          <path d="M490,275 C500,245 530,235 552,248 C566,257 566,280 554,295 C540,308 512,308 500,296 C492,288 488,284 490,275 Z" fill="#e2ecda"/>
+          <text class="place mtn" x="452" y="172" text-anchor="middle">금정산</text>
+          <text class="place mtn" x="705" y="222" text-anchor="middle">장산</text>
+          <text class="place" x="860" y="240" text-anchor="middle">기장</text>
+          <text class="place" x="802" y="336" text-anchor="middle">송정</text>
+          <text class="place" x="700" y="410" text-anchor="middle">해운대</text>
+          <text class="place" x="640" y="350" text-anchor="middle">센텀시티</text>
+          <text class="place" x="597" y="424" text-anchor="middle">광안리</text>
+          <text class="place" x="538" y="566" text-anchor="middle">이기대</text>
+          <text class="place" x="468" y="598" text-anchor="middle">영도</text>
+          <text class="place" x="445" y="672" text-anchor="middle">태종대</text>
+          <text class="place" x="388" y="512" text-anchor="end">자갈치</text>
+          <text class="place" x="430" y="590" text-anchor="middle">송도</text>
+          <text class="place" x="258" y="664" text-anchor="middle">다대포</text>
+          <text class="place" x="258" y="536" text-anchor="middle">을숙도</text>
+          <text class="place" x="175" y="420" text-anchor="middle">낙동강</text>
+          <text class="place" x="450" y="470" text-anchor="middle">부산역</text>
+          <text class="place" x="448" y="372" text-anchor="middle">서면</text>
+          <text class="place" x="522" y="222" text-anchor="middle">온천천</text>
+          <g id="routes">
+            <path id="route-1" class="route r5" d="M652,380 C672,385 690,386 700,385 C712,375 719,365 721,358 C725,363 727,369 727,376"/>
+            <path id="route-2" class="route r5" d="M467,545 C480,547 490,548 500,548 C510,547 519,544 528,540 C534,534 539,528 544,522"/>
+            <path id="route-3" class="route r5" d="M596,399 C582,372 566,342 557,310"/>
+            <path id="route-4" class="route r10" d="M596,399 C608,389 619,380 630,371 C640,373 648,375 655,378 C670,380 686,381 700,385 C708,374 715,368 722,363 C724,367 726,371 727,376 C739,375 750,374 762,372"/>
+            <path id="route-5" class="route r10" d="M311,362 C300,395 292,435 285,465 C279,485 271,498 263,508"/>
+            <path id="route-6" class="route r10" d="M466,552 C484,559 497,574 500,592 C502,612 494,630 480,644 C469,651 457,654 450,651 C441,643 437,627 439,609 C442,590 452,568 463,556"/>
+            <path id="route-7" class="route r15" d="M418,565 C414,557 411,551 408,545 C406,538 404,531 402,524 C406,526 410,527 415,528 C423,529 431,530 440,532 C448,536 457,541 467,545 C477,546 488,547 500,548 C510,547 519,544 528,540 C534,534 539,528 544,522 C556,501 567,476 575,450 C579,432 586,413 596,399"/>
+            <path id="route-8" class="route r15" d="M508,232 C522,262 540,282 556,310 C564,342 580,372 596,399"/>
+            <path id="route-9" class="route r20" d="M262,634 L300,645 C315,643 333,642 350,640 C366,638 383,635 400,628 C401,619 403,610 405,600 C408,590 413,577 418,565 C415,558 412,552 408,545 C406,538 404,531 402,524 C406,526 410,527 415,528 C423,529 431,530 440,532 C448,536 457,541 467,545 C477,546 488,547 500,548 C510,547 519,544 528,540 C534,534 539,528 544,522 C556,501 567,476 575,450 C579,432 586,413 596,399 C607,389 618,379 630,370 C638,373 646,375 655,378 C670,380 686,381 700,385 C708,374 715,368 722,363 C724,367 726,371 727,376 C739,375 750,374 762,372"/>
+            <path id="route-10" class="route r20" d="M455,112 C505,118 545,150 540,195 C536,235 500,262 455,258 C412,254 378,228 382,185 C386,145 415,107 455,112 Z"/>
+          </g>
+          <g id="markers"></g>
+        </svg>
+        <div class="map-legend">
+          <span class="lg"><i style="background:var(--cat5)"></i>5km</span>
+          <span class="lg"><i style="background:var(--cat10)"></i>10km</span>
+          <span class="lg"><i style="background:var(--cat15)"></i>15km</span>
+          <span class="lg"><i style="background:var(--cat20)"></i>20km+</span>
+          <button class="map-reset" id="resetBtn">지도 초기화</button>
+        </div>
+      </div>
+      <p class="map-note">※ 실제 지형을 단순화한 코스 지도입니다. 거리는 대략적인 값이에요.</p>
+    </div>
+
+    <div id="courses">
+      <div class="tabs" id="tabs">
+        <button class="tab on" data-cat="all">전체</button>
+        <button class="tab" data-cat="5">5km</button>
+        <button class="tab" data-cat="10">10km</button>
+        <button class="tab" data-cat="15">15km</button>
+        <button class="tab" data-cat="20">20km</button>
+      </div>
+      <div class="cards" id="cardList"></div>
+    </div>
+  </div>
+
+  <h2 class="sec-title" id="guide">거리별 가이드</h2>
+  <p class="sec-sub">내 체력에 맞는 거리, 이렇게 고르세요.</p>
+  <div class="guide">
+    <div class="g-item" style="--catc:var(--cat5)">
+      <h4>5km</h4><div class="who">입문 · 아침 러닝</div>
+      <p>해안 루프 한 바퀴. 아침 공기와 파도 소리를 맡기 딱 좋은 가벼운 거리.</p>
+      <span class="time">30 ~ 45분</span>
+    </div>
+    <div class="g-item" style="--catc:var(--cat10)">
+      <h4>10km</h4><div class="who">초·중급 · 종주 도전</div>
+      <p>동네를 넘어 경치 좋은 지역까지. 첫 종주 코스로 도전하기 좋은 단위.</p>
+      <span class="time">1시간 ~ 1시간 30분</span>
+    </div>
+    <div class="g-item" style="--catc:var(--cat15)">
+      <h4>15km</h4><div class="who">중급 · 보급 필요</div>
+      <p>중간에 물 보충이 필요해지는 거리. 편의점 위치를 미리 봐두세요.</p>
+      <span class="time">1시간 30분 ~ 2시간</span>
+    </div>
+    <div class="g-item" style="--catc:var(--cat20)">
+      <h4>20km+</h4><div class="who">상급 · 대장 코스</div>
+      <p>하프 훈련용 장거리. 물 1.5L, 젤, 트레일화까지 준비하고 출발!</p>
+      <span class="time">2시간 30분 ~ 4시간</span>
+    </div>
+  </div>
+
+  <h2 class="sec-title" id="tips">부산 러너 꿀팁</h2>
+  <p class="sec-sub">현지 러너들이 알려주는 실전 팁 6가지.</p>
+  <div class="tips">
+    <div class="tip-card"><h4><span class="no">1</span>지하철로 순환 러닝</h4><p>지하철 1일권을 끊고 시작점과 귀가역만 정하면 끝. 해안 종주는 출발역과 도착역이 다르니 회수 동선을 미리 확인하세요.</p></div>
+    <div class="tip-card"><h4><span class="no">2</span>시간대 고르기</h4><p>여름(6~8월)은 06시 이전 일출 러닝, 겨울은 10~15시가 쾌적. 야간은 수영강변·광안리처럼 조명 밝은 코스로.</p></div>
+    <div class="tip-card"><h4><span class="no">3</span>바람 방향 확인</h4><p>해안 코스는 바람이 강해요. 갈 때 맞바람, 올 때 순풍이 되도록 바람 반대편에서 출발하면 훨씬 수월합니다.</p></div>
+    <div class="tip-card"><h4><span class="no">4</span>보급 계획</h4><p>10km 이상은 물 500ml + 젤. 이기대·영도·금정산은 중간에 편의점이 없어요. 송도·남항·광안리가 주요 보급 지점.</p></div>
+    <div class="tip-card"><h4><span class="no">5</span>안전 장비</h4><p>이어폰 볼륨은 50% 이하, 밤엔 전면등과 반사조끼. 트레일 코스(이기대·영도·금정산)는 트레일화를 신으세요.</p></div>
+    <div class="tip-card"><h4><span class="no">6</span>대회 시즌 주의</h4><p>봄·가을 주말엔 해운대·광안리 일대 교통통제가 잦아요. 마라톤 대회 일정을 확인하고 뛰면 응원받는 러닝이 됩니다.</p></div>
+  </div>
+</main>
+
+<footer>
+  <b>BUSAN RUN</b> — 부산의 예쁜 길로 달려요<br>
+  부산광역시전도를 참고해 제작한 코스 지도 · 코스 거리와 소요 시간은 개인차가 있을 수 있습니다
+</footer>
+
+<script>
+const CAT = {"5":{label:"5km",color:"#14b8c4"},"10":{label:"10km",color:"#2fae5f"},"15":{label:"15km",color:"#f59e0b"},"20":{label:"20km+",color:"#ef4444"}};
+const LEVEL = ["","입문","초·중급","도전"];
+
+const courses = [
+ {id:1, cat:"5", name:"해운대 해변 & 달맞이길 루프", dist:"5.2km", time:"약 40분", level:1, terrain:"플랫 + 짧은 고개",
+  start:"지하철 2호선 해운대역 3번 출구",
+  mood:"에메랄드빛 새벽 바다를 따라 달맞이길 고개를 넘고 미포 골목으로 돌아오는, 부산 러닝의 정석 코스.",
+  route:"해운대해수욕장 - 동백섬 누리마루(서쪽 왕복 1.5km) - 해변산책로 - 달맞이길 해안산책로 - 미포골목 - 해운대 복귀",
+  points:["일출 직후 바다가 통째로 분홍빛으로 물드는 시간","4월 달맞이길 벚꽃과 파도 소리 힐링 구간","미포 골목 카페에서 쿨다운 마무리"],
+  tip:"여름 낮엔 관광객이 많아 새벽 5~7시 러닝이 쾌적. 화장실·샤워는 해운대 해수욕장 정보센터 이용.",
+  mapQ:"해운대해수욕장", x:700, y:385},
+ {id:2, cat:"5", name:"이기대 해안절벽 트레일", dist:"4.7km", time:"약 1시간 20분", level:2, terrain:"절벽 데크로드 + 언덕",
+  start:"지하철 1호선 남항역 - 버스 5분, 남항등대",
+  mood:"도심에서 가장 가까운 절벽 트레일. 파도가 바위에 부딪히는 소리만 남는 고요한 해안길.",
+  route:"남항등대 - 이기대 조형물 - 해안절벽 데크로드 - 우암보트경기장",
+  points:["절벽 위에서 내려다보는 부산항과 크루즈선 파노라마","봄 벚꽃과 이기대축제(5월) 시즌은 특히 예쁨","종점 우암 만선 골목에서 회 한 점 보상 러닝"],
+  tip:"그립 좋은 러닝화 추천. 비 온 뒤 데크로드가 미끄러우니 주의하세요.",
+  mapQ:"이기대해안산책로", x:467, y:545},
+ {id:3, cat:"5", name:"수영강변 달빛로 왕복", dist:"4.5km (왕복 9km)", time:"약 30분", level:1, terrain:"완평 아스팔트",
+  start:"지하철 2호선 광안리해변역 5번 출구",
+  mood:"밤에 더 예쁜 강변 플랫 코스. LED 조명 아래 페이스 트레이닝 하기 딱 좋은 도심 리버 러닝.",
+  route:"광안리 - 수영강변 달빛로(북측) - 온천천 합류점 - 같은 길 복귀",
+  points:["신호등 없는 완평 구간 - 인터벌·PB 연습에 최적","광안대교 야경이 강물에 비치는 밤러닝 명소","매일 저녁 러너들이 모이는 부산 대표 야간 코스"],
+  tip:"밤 10시 이후엔 인적이 뜸해지니 8~10시 사이가 가장 활기차고 안전.",
+  mapQ:"수영강변달빛로", x:596, y:399},
+ {id:4, cat:"10", name:"광안리 - 청사포 해안 종주", dist:"9.2km", time:"약 1시간 10분", level:2, terrain:"해안길 + 짧은 고개",
+  start:"지하철 2호선 광안리해변역",
+  mood:"부산에서 가장 예쁜 9km. 광안대교 야경에서 출발해 다릿돌 전망대에서 끝나는 하이라이트 릴레이.",
+  route:"광안리 - 동백섬 - 해운대 해변 - 달맞이길 - 미포골목 - 청사포 다릿돌전망대",
+  points:["동백섬 누리마루 등대 돌파 구간","미포 골목에서 고개를 넘는 짧은 상승","청사포 하늘색 해변열차로 귀가 가능"],
+  tip:"귀가는 청사포 - 어린이대공원역 도보 10분 또는 해변열차. 석양 시간대 추천.",
+  mapQ:"청사포다릿돌전망대", x:610, y:392},
+ {id:5, cat:"10", name:"낙동강 하구 에코 러닝", dist:"10km", time:"약 1시간 10분", level:1, terrain:"완평 둔치길",
+  start:"2호선 덕포역 - 버스 또는 택시 10분, 삼락생태공원",
+  mood:"갈대밭 사이로 바람을 가르는 플랫 코스. 서쪽 하늘에 노을이 지는 시간이 압권인 에코 러닝.",
+  route:"삼락생태공원 둘레길 - 낙동강 하구둔치 - 을숙도대교 - 을숙도 생태공원 - 원로 복귀",
+  points:["겨울 철새 도래지 - 두루미와 오리 떼 구경","가을엔 은빛 갈대밭 터널","부산에서 가장 잔잔한 노을 명소"],
+  tip:"주변에 편의점이 드물어 물을 미리 준비하세요. 주말엔 자전거가 많으니 우측 통행.",
+  mapQ:"삼락생태공원", x:311, y:362},
+ {id:6, cat:"10", name:"영도 둘레길 풀코스", dist:"10.8km", time:"약 3시간 30분", level:3, terrain:"해안 트레일 + 계단",
+  start:"지하철 1호선 남항역 - 남항여객터미널",
+  mood:"배의 도시 영도를 한 바퀴. 절벽, 등대, 하얀 죽성성지까지 - 달리면 짜릿하고 걸으면 아까운 섬 둘레길.",
+  route:"봉래동 남항터미널 - 절영해안산책로 - 태종대 - 죽성성지 - 홍도해안산책로 - 봉래 1·2부두",
+  points:["태종대 절벽과 등대 - 부산 대표 절경","하얀 죽성성지 전망대에서 바라보는 항구 풍경","영도다리·부산대교·숭어다리 다리 3형제 건너기"],
+  tip:"러닝보다 파워워킹 페이스 추천. 계단과 바위 구간이 많아 트레일화 필수.",
+  mapQ:"영도둘레길", x:476, y:556},
+ {id:7, cat:"15", name:"송도 - 광안리 서부산 해안 종주", dist:"15.5km", time:"약 1시간 50분", level:2, terrain:"해안도로 + 절벽 구간",
+  start:"지하철 1호선 자갈치역 - 버스 10분, 송도해수욕장",
+  mood:"옛 부산의 냄새(자갈치)에서 현대의 야경(광안리)까지 - 100년 부산을 15km로 관통하는 종주 코스.",
+  route:"송도해수욕장 - 송도해안 - 자갈치시장 - 남항 - 이기대 해안산책로 - 광안리",
+  points:["출발지 송도 스카이워크와 해상 케이블카 풍경","아침 자갈치시장 활기 - 부산 최고의 아침 풍경","이기대 절벽 구간 뒤 광안대교 야경 피날레"],
+  tip:"자갈치 - 남항 구간은 아침에 짐수레와 차량이 많아 주의. 보급은 남항 편의점.",
+  mapQ:"송도해수욕장", x:418, y:565},
+ {id:8, cat:"15", name:"온천천 - 수영강 리버 종주", dist:"15km", time:"약 1시간 45분", level:1, terrain:"완평 강변",
+  start:"지하철 1호선 온천장역",
+  mood:"신호등 걱정 없는 도심 리버 15km. 온천장 온기에서 시작해 광안대교 아래서 마무리하는 완평 대장정.",
+  route:"온천장역 - 온천천 산책로 - 동래읍성 옆 - 수영강 합류점 - 수영강변 달빛로 - 광안리",
+  points:["거의 끝까지 신호등 없는 완평 - PB 도전용","동래읍성·충렬사 옆을 지나는 역사 산책 구간","피날레 광안리에서 온천 족욕으로 마무리"],
+  tip:"귀가는 광안리해변역. 저녁 7~9시 러너가 가장 많고 밝아서 안전.",
+  mapQ:"온천천시민공원", x:508, y:232},
+ {id:9, cat:"20", name:"다대포 - 청사포 종주 대장코스", dist:"21km", time:"약 2시간 40분", level:3, terrain:"해안도로 종주",
+  start:"지하철 1호선 다대포해수욕장역",
+  mood:"부산 해안선을 통째로 달리는 대장 코스. 남해 갯바위에서 동해 파도까지 - 하루에 두 바다를 만나는 21km.",
+  route:"다대포 - 몰운대 - 송도 - 암남공원 - 자갈치 - 남항 - 이기대 - 광안리 - 해운대 - 청사포",
+  points:["출발 다대포 몰운대 갯바위와 낙동강 하구 전망","중반 이기대 절벽 구간이 최대 고비","해운대 해변 피날레 - 바다를 향해 스프린트"],
+  tip:"물 500ml x 2 + 젤 필수. 보급 지점은 송도·남항·광안리. 귀가는 청사포 근처 어린이대공원역.",
+  mapQ:"다대포해수욕장", x:262, y:634},
+ {id:10, cat:"20", name:"금정산 둘레길 풀코스", dist:"21.4km", time:"약 4시간", level:3, terrain:"산악 트레일",
+  start:"지하철 1호선 노포역 - 두구불암천 입구",
+  mood:"성곽 아래 벚꽃 터널을 달리는 트레일. 도심 위 800m 능선을 도는 부산 최고의 산 러닝.",
+  route:"두구불암천 - 한적사 - 금정산성 남문 - 북문 - 벚꽃길 - 금성공원 - 두구불암천 복귀",
+  points:["4월 금정산 봄벚꽃 터널이 전설","조선시대 산성 돌담길 위로 달리기","능선 전망대에서 바라보는 부산 도심 360도"],
+  tip:"트레일화 + 물 1.5L + 간식 필수. 겨울엔 결빙, 여름엔 진드기 주의. 시간은 넉넉히.",
+  mapQ:"금정산성", x:470, y:105}
+];
+
+const cardList = document.getElementById("cardList");
+const markersG = document.getElementById("markers");
+const tabs = document.getElementById("tabs");
+let activeCat = "all", selectedId = null;
+
+function stars(n){ return "★".repeat(n) + "☆".repeat(3-n); }
+
+cardList.innerHTML = courses.map(c => {
+  const cat = CAT[c.cat];
+  return `
+  <article class="card" data-id="${c.id}" data-cat="${c.cat}" style="--catc:${cat.color}">
+    <div class="card-top">
+      <span class="badge">${cat.label}</span>
+      <h3>${c.name}</h3>
+      <span class="stars">${stars(c.level)}<small>${LEVEL[c.level]}</small></span>
+    </div>
+    <p class="mood">${c.mood}</p>
+    <div class="chips">
+      <span class="chip">거리 <b>${c.dist}</b></span>
+      <span class="chip">시간 <b>${c.time}</b></span>
+      <span class="chip">지형 <b>${c.terrain}</b></span>
+    </div>
+    <details>
+      <summary>코스 상세 · 교통 · 팁</summary>
+      <div class="detail-body">
+        <span class="lbl">코스 루트</span>${c.route}
+        <span class="lbl">이런 점이 좋아요</span>
+        <ul>${c.points.map(p=>`<li>${p}</li>`).join("")}</ul>
+        <span class="lbl">시작점</span>${c.start}
+        <div class="tipbox">TIP ${c.tip}</div>
+        <a class="maplink" href="https://map.naver.com/p/search/${encodeURIComponent(c.mapQ)}" target="_blank" rel="noopener">네이버지도에서 시작점 보기</a>
+      </div>
+    </details>
+  </article>`;
+}).join("");
+
+markersG.innerHTML = courses.map(c => `
+  <g class="mk" data-id="${c.id}" data-cat="${c.cat}" transform="translate(${c.x},${c.y})">
+    <circle r="10" fill="${CAT[c.cat].color}" stroke="#fff" stroke-width="2.5"/>
+    <text text-anchor="middle" dy="3.5">${c.id}</text>
+  </g>`).join("");
+
+function applyFilter(){
+  document.querySelectorAll(".card").forEach(el=>{
+    el.style.display = (activeCat==="all" || el.dataset.cat===activeCat) ? "" : "none";
+  });
+  const match = c => (activeCat==="all" || c.cat===activeCat);
+  document.querySelectorAll(".route").forEach(el=>{
+    const c = courses.find(x=>x.id==el.id.replace("route-",""));
+    el.classList.toggle("dim", !match(c) || (selectedId!==null && c.id!==selectedId));
+    el.classList.toggle("hot", c.id===selectedId);
+  });
+  document.querySelectorAll(".mk").forEach(el=>{
+    const c = courses.find(x=>x.id==el.dataset.id);
+    el.classList.toggle("dim", !match(c) || (selectedId!==null && c.id!==selectedId));
+  });
+}
+
+function select(id){
+  selectedId = (selectedId===id) ? null : id;
+  document.querySelectorAll(".card").forEach(el=>el.classList.toggle("sel", Number(el.dataset.id)===selectedId));
+  applyFilter();
+}
+
+tabs.addEventListener("click", e=>{
+  const btn = e.target.closest(".tab");
+  if(!btn) return;
+  tabs.querySelectorAll(".tab").forEach(t=>t.classList.toggle("on", t===btn));
+  activeCat = btn.dataset.cat;
+  selectedId = null;
+  document.querySelectorAll(".card").forEach(el=>el.classList.remove("sel"));
+  applyFilter();
+});
+
+cardList.addEventListener("click", e=>{
+  const card = e.target.closest(".card");
+  if(!card) return;
+  if(e.target.closest("summary") || e.target.closest("a")) return;
+  select(Number(card.dataset.id));
+});
+
+markersG.addEventListener("click", e=>{
+  const mk = e.target.closest(".mk");
+  if(!mk) return;
+  const id = Number(mk.dataset.id);
+  select(id);
+  const card = document.querySelector(`.card[data-id="${id}"]`);
+  if(card && card.style.display!=="none") card.scrollIntoView({behavior:"smooth", block:"center"});
+});
+
+document.getElementById("resetBtn").addEventListener("click", ()=>{
+  selectedId = null;
+  document.querySelectorAll(".card").forEach(el=>el.classList.remove("sel"));
+  applyFilter();
+});
+
+applyFilter();
+</script>
+</body>
+</html>
